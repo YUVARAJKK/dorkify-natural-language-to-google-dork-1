@@ -316,10 +316,10 @@ This project is open source and available under the [MIT License](LICENSE).
 
 For issues, questions, or suggestions:
 - Open an issue on GitHub
-- Contact: [your-email@example.com]
+- Contact: [yuvarajkk76@gmail.com]
 
 ---
 
-**Made with 💜 by [Your Name]**
+**Made with 💜 by [YUVARAJ & TEAM]**
 
 *Empowering ethical security research through advanced search capabilities*
