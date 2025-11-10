@@ -86,7 +86,7 @@ export default function DorkConverter() {
 
   const handleTemplateClick = (query: string) => {
     setDorkOutput(query);
-    toast.success("Template loaded!");
+    toast.success("Template loaded! You can now edit the query.");
   };
 
   return (
@@ -178,20 +178,25 @@ export default function DorkConverter() {
           </Button>
         </div>
 
-        {/* Output Section */}
+        {/* Output Section - NOW EDITABLE */}
         {dorkOutput && (
           <div className="space-y-4 pt-6 border-t border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <label className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Generated Google Dork
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="dork-output" className="text-sm font-semibold text-foreground uppercase tracking-wider">
+                Generated Google Dork
+              </label>
+              <span className="text-xs text-muted-foreground">✏️ Editable</span>
+            </div>
             
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative bg-background/90 backdrop-blur-sm border border-primary/30 rounded-lg p-4">
-                <code className="block text-lg font-mono text-foreground break-all leading-relaxed">
-                  {dorkOutput}
-                </code>
-              </div>
+              <Textarea
+                id="dork-output"
+                value={dorkOutput}
+                onChange={(e) => setDorkOutput(e.target.value)}
+                className="relative min-h-[100px] bg-background/90 backdrop-blur-sm border-primary/30 text-foreground font-mono text-lg resize-none focus:border-primary/50 transition-colors"
+                placeholder="Your Google Dork query will appear here..."
+              />
             </div>
 
             {/* Action Buttons */}
