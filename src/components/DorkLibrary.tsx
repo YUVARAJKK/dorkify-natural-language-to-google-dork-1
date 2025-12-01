@@ -11,7 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Code2, FileSearch, Copy, Search, Filter, Sparkles } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { BookOpen, Code2, FileSearch, Copy, Search, Filter, Sparkles, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 
 interface DorkOperator {
@@ -305,6 +306,7 @@ export default function DorkLibrary() {
   const [selectedOperator, setSelectedOperator] = useState<DorkOperator | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [editedExample, setEditedExample] = useState("");
 
   const categories = ["all", ...Array.from(new Set(dorkOperators.map(op => op.category)))];
   
@@ -318,6 +320,7 @@ export default function DorkLibrary() {
   const handleOperatorSelect = (value: string) => {
     const operator = dorkOperators.find(op => op.operator === value);
     setSelectedOperator(operator || null);
+    setEditedExample(operator?.example || "");
   };
 
   const handleCopyOperator = async () => {
@@ -328,18 +331,19 @@ export default function DorkLibrary() {
   };
 
   const handleCopyExample = async () => {
-    if (selectedOperator) {
-      await navigator.clipboard.writeText(selectedOperator.example);
+    if (editedExample) {
+      await navigator.clipboard.writeText(editedExample);
       toast.success("Example copied!");
     }
   };
 
   const handleSearchExample = () => {
-    if (selectedOperator) {
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(selectedOperator.example)}`;
+    if (editedExample) {
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(editedExample)}`;
       const isInIframe = window.self !== window.top;
       if (isInIframe) {
         window.parent.postMessage({ type: "OPEN_EXTERNAL_URL", data: { url: searchUrl } }, "*");
+        toast.success("Opening in new tab...");
       } else {
         window.open(searchUrl, "_blank", "noopener,noreferrer");
       }
@@ -475,23 +479,33 @@ export default function DorkLibrary() {
               </div>
             </div>
 
-            {/* Example */}
+            {/* Example - NOW EDITABLE */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-semibold text-foreground uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span>Example Query</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span>Example Query</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Edit3 className="w-3 h-3" />
+                  <span>✏️ Editable</span>
+                </div>
               </div>
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur-xl opacity-50" />
-                <div className="relative bg-background/90 backdrop-blur-sm border border-primary/30 rounded-lg p-5 space-y-3">
-                  <code className="block text-base font-mono text-foreground break-all leading-relaxed">
-                    {selectedOperator.example}
-                  </code>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="relative space-y-3">
+                  <Textarea
+                    value={editedExample}
+                    onChange={(e) => setEditedExample(e.target.value)}
+                    className="relative min-h-[100px] bg-background/90 backdrop-blur-sm border-primary/30 text-foreground font-mono text-base resize-none focus:border-primary/50 transition-colors leading-relaxed"
+                    placeholder="Edit the example query..."
+                  />
                   <div className="flex gap-2">
                     <Button
                       size="sm"
                       onClick={handleSearchExample}
-                      className="bg-primary hover:bg-primary/90"
+                      disabled={!editedExample.trim()}
+                      className="bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Search className="w-4 h-4 mr-2" />
                       Try on Google
@@ -500,7 +514,8 @@ export default function DorkLibrary() {
                       size="sm"
                       variant="outline"
                       onClick={handleCopyExample}
-                      className="border-border/60 hover:border-primary/50"
+                      disabled={!editedExample.trim()}
+                      className="border-border/60 hover:border-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy
